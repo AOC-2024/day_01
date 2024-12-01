@@ -3,13 +3,13 @@ use std::fs::read_to_string;
 pub fn find_total_distance(input_path: &str) -> u32 {
     let puzzle = extract_puzzle(input_path);
 
-    return find_distance(puzzle);
+    find_distance(puzzle)
 }
 
 pub fn find_similarity_score(input_path: &str) -> u32 {
     let puzzle = extract_puzzle(input_path);
 
-    return 0;
+    similarity_score(puzzle)    
 }
 
 #[derive(PartialEq)]
@@ -75,6 +75,22 @@ fn find_distance(puzzle: Puzzle) -> u32 {
     })
 }
 
+fn similarity_score(puzzle: Puzzle) -> u32 {
+    if puzzle.left.is_empty() || puzzle.right.is_empty() {
+        return 0;
+    }
+
+    puzzle.left.iter().fold(0, |acc, &value_to_compare| {
+        let occurrences = puzzle
+            .right
+            .iter()
+            .filter(|&&value| value_to_compare == value)
+            .count() as u32;
+
+        acc + value_to_compare * occurrences
+    })
+}
+ 
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -125,5 +141,53 @@ mod tests {
             left: vec![5, 3, 2],
             right: vec![3, 5, 4]
         }), 2)
+    }
+
+    #[test]
+    fn should_similarity_score_0_when_no_value() {
+        assert_eq!(similarity_score(Puzzle {
+            left: vec![],
+            right: vec![]
+        }), 0)
+    }
+
+    #[test]
+    fn should_similarity_score_0_when_no_value_is_no_matching_value() {
+        assert_eq!(similarity_score(Puzzle {
+            left: vec![1],
+            right: vec![2]
+        }), 0)
+    }
+
+    #[test]
+    fn should_similarity_score_1_when_one_value_present_and_matching() {
+        assert_eq!(similarity_score(Puzzle {
+            left: vec![1],
+            right: vec![1]
+        }), 1)
+    }
+
+    #[test]
+    fn should_similarity_score_4_when_one_value_present_4_and_matching() {
+        assert_eq!(similarity_score(Puzzle {
+            left: vec![4],
+            right: vec![4]
+        }), 4)
+    }
+
+    #[test]
+    fn should_similarity_score_8_when_one_value_present_4_and_matching_two_times() {
+        assert_eq!(similarity_score(Puzzle {
+            left: vec![4],
+            right: vec![4, 4]
+        }), 8)
+    }
+
+    #[test]
+    fn should_similarity_score_when_multiples_values_in_left_and_right() {
+        assert_eq!(similarity_score(Puzzle {
+            left: vec![4, 1],
+            right: vec![4, 1]
+        }), 5)
     }
 }
