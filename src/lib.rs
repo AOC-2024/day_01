@@ -6,6 +6,12 @@ pub fn find_total_distance(input_path: &str) -> u32 {
     return find_distance(puzzle);
 }
 
+pub fn find_similarity_score(input_path: &str) -> u32 {
+    let puzzle = extract_puzzle(input_path);
+
+    return 0;
+}
+
 #[derive(PartialEq)]
 #[derive(Debug)]
 struct Puzzle {
